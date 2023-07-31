@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(cors());
 
 
-app.use('/kolo', indexRoute);
+app.use('/', indexRoute);
 app.use('/kolo', userRoute);
 app.use('/kolo', flutterwaveRouter);
 app.use('/kolo', walletRouter);

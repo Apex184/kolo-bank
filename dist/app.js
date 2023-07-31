@@ -29,7 +29,7 @@ app.use(express_1.default.json({
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)());
-app.use('/kolo', indexRouter_1.default);
+app.use('/', indexRouter_1.default);
 app.use('/kolo', userRouter_1.default);
 app.use('/kolo', flutterWaveRoute_1.default);
 app.use('/kolo', walletRouter_1.default);
