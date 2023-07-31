@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Receive Payment</title>
+  </head>
+  <body>
+    <form>
+     
+      <button type="button" onClick="makePayment()">Pay Now</button>
+    </form>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script>
+      function makePayment() {
+        FlutterwaveCheckout({
+          public_key: "FLWPUBK_TEST-661f207a8c29b8711c34bbfa944b5497-X",
+          tx_ref: "hooli-tx-1920bbtyt",
+          amount: 1000,
+          currency: "NGN",
+          country: "NG",
+          "payment_method": "card",
+
+          // specified redirect URL
+          redirect_url: "http://localhost:8080/kolo/verify-fund",
+
+          // use customer details if user is not logged in, else add user_id to the request
+          customer: {
+            email: "akindeleapex@gmail.com",
+            phone_number: "08165275980",
+            name: "John Doe",
+          },
+          callback: function (data) {
+            console.log(data);
+          },
+          onclose: function () {
+          },
+          customizations: {
+            title: "Kolo",
+            description: "Kolo Savings",
+            logo: "https://cdn.iconscout.com/icon/premium/png-256-thumb/payment-2193968-1855546.png",
+          },
+        });
+      }
+    </script>
+  </body>
+</html>
