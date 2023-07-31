@@ -42,7 +42,7 @@ export const forgotPasswordSchema = Joi.object().keys({
 
 // export const generateLoginToken = (user: { [key: string]: unknown }): string => {
 export const generateLoginToken = ({ _id, email }: UserToken): string => {
-    const pass = process.env.ADMIN_SECRET_KEY as string;
+    const pass = process.env.JWT_SECRET as string;
     const user = { _id, email }
     return jwt.sign(user, pass, { expiresIn: '5h' });
     // return jwt.sign(user, pass, { expiresIn: '1d' });

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import bcrypt from 'bcryptjs'
@@ -80,11 +80,14 @@ export const RegisterUser = async (req: Request, res: Response): Promise<unknown
 };
 
 
-export async function verifyUser(req: Request, res: Response) {
+export async function verifyUser(req: Request, res: Response, next: NextFunction) {
     try {
         const token = req.params.token;
+
         try {
-            const { email } = jwt.verify(token, jwtsecret) as jwtPayload;
+            const { email, _id } = jwt.verify(token, jwtsecret) as jwtPayload;
+            console.log(email);
+            console.log(_id);
             if (!email) {
                 return errorResponse(res, "Verification failed: Email not found in token", httpStatus.BAD_REQUEST);
             }

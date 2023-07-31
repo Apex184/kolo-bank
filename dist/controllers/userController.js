@@ -66,11 +66,13 @@ const RegisterUser = async (req, res) => {
     }
 };
 exports.RegisterUser = RegisterUser;
-async function verifyUser(req, res) {
+async function verifyUser(req, res, next) {
     try {
         const token = req.params.token;
         try {
-            const { email } = jsonwebtoken_1.default.verify(token, jwtsecret);
+            const { email, _id } = jsonwebtoken_1.default.verify(token, jwtsecret);
+            console.log(email);
+            console.log(_id);
             if (!email) {
                 return (0, helperFunctions_1.errorResponse)(res, "Verification failed: Email not found in token", http_status_1.default.BAD_REQUEST);
             }

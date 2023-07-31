@@ -33,7 +33,7 @@ exports.forgotPasswordSchema = joi_1.default.object().keys({
 });
 // export const generateLoginToken = (user: { [key: string]: unknown }): string => {
 const generateLoginToken = ({ _id, email }) => {
-    const pass = process.env.ADMIN_SECRET_KEY;
+    const pass = process.env.JWT_SECRET;
     const user = { _id, email };
     return jsonwebtoken_1.default.sign(user, pass, { expiresIn: '5h' });
     // return jwt.sign(user, pass, { expiresIn: '1d' });
