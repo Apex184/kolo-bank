@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendMoneyToAnotherWallet = exports.getUserWalletById = exports.updateWallet = exports.createTransaction = exports.createWalletTransaction = exports.createBankAccount = exports.createWallet = void 0;
+exports.LockedUsersAccount = exports.sendMoneyToAnotherWallet = exports.getUserWalletById = exports.updateWallet = exports.createTransaction = exports.createWalletTransaction = exports.createBankAccount = exports.createWallet = void 0;
 const walletShema_1 = require("../models/walletShema");
 const walletTransaction_1 = require("../models/walletTransaction");
 const transactionSchema_1 = require("../models/transactionSchema");
+const userSchema_1 = require("../models/userSchema");
 const walletHistory_1 = require("../models/walletHistory");
 const bankAcctSchema_1 = require("../models/bankAcctSchema");
 // We are creating wallet automatically
@@ -165,4 +166,19 @@ const sendMoneyToAnotherWallet = async (user, amount, destination) => {
     }
 };
 exports.sendMoneyToAnotherWallet = sendMoneyToAnotherWallet;
+const LockedUsersAccount = async (userId) => {
+    try {
+        const user = await userSchema_1.User.findById(userId);
+        if (!user) {
+            throw new Error('User not found.');
+        }
+        user.isLocked = true;
+        await user.save();
+        return user;
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.LockedUsersAccount = LockedUsersAccount;
 //# sourceMappingURL=functionsController.js.map

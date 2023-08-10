@@ -51,6 +51,7 @@ export interface UserInterface extends mongoose.Document {
     };
     accountType: string;
     isVerified: Boolean;
+    isLocked: Boolean;
     bvn: Bvn;
     bankAccounts: mongoose.Types.ObjectId | BankAccount;
     wallet: mongoose.Types.ObjectId | Wallet;
@@ -103,6 +104,11 @@ const userSchema = new mongoose.Schema<UserInterface>({
         required: true,
     },
     isBvnVerified: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
+    isLocked: {
         type: Boolean,
         default: false,
         required: true,

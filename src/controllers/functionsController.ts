@@ -190,3 +190,18 @@ export const sendMoneyToAnotherWallet = async (user: ObjectId, amount: number, d
     }
 };
 
+
+export const LockedUsersAccount = async (userId: ObjectId) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found.');
+        }
+        user.isLocked = true;
+        await user.save();
+        return user;
+    } catch (error) {
+        console.log(error);
+    }
+}
+

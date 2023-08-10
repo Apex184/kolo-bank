@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 import httpStatus from 'http-status';
 import { User } from "../models/userSchema";
 import bcrypt from 'bcryptjs'
@@ -9,6 +9,7 @@ import { errorResponse, serverError, successResponse, successResponseLogin } fro
 import mailer from '../mailers/sendMail';
 import { emailVerificationView } from '../mailers/mailTemplate';
 import { Admin, AdminIT } from '../models/adminSchema';
+import { LockedUsersAccount } from '../controllers/functionsController';
 const jwtsecret = process.env.ADMIN_SECRET_KEY as string;
 const fromUser = process.env.FROM as string;
 interface jwtPayload {
@@ -101,5 +102,30 @@ export const ViewAllUsers = async (req: Request, res: Response) => {
         console.log(error);
         return serverError(res);
     }
+}
+
+
+export const LockAccount = async (req: Request, res: Response) => {
+    try {
+        const { userId } = req.params;
+        const userObjectId = new mongoose.Schema.Types.ObjectId(userId);
+        let { reason } = req.body;
+        const locker = await LockedUsersAccount(userObjectId);
+        if (!locker) {
+            return errorResponse(res, 'User not found', httpStatus.NOT_FOUND);
+        }
+        // if (locker.reason) {
+        //     return errorResponse(res, 'User already locked', httpStatus.CONFLICT);
+        // }
+        // reason = reason ? reason : 'No reason provided';
+        // locker.reason = reason;
+        // await locker.save();
+        return successResponse(res, 'User locked successfully', httpStatus.OK, locker);
+
+    } catch (error) {
+        console.log(error);
+        return serverError(res);
+    }
+
 }
 

@@ -3,13 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ViewAllUsers = exports.LoginAdmin = exports.RegisterAdmin = void 0;
+exports.LockAccount = exports.ViewAllUsers = exports.LoginAdmin = exports.RegisterAdmin = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const http_status_1 = __importDefault(require("http-status"));
 const userSchema_1 = require("../models/userSchema");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const validations_1 = require("../utills/validations");
 const helperFunctions_1 = require("../utills/helperFunctions");
 const adminSchema_1 = require("../models/adminSchema");
+const functionsController_1 = require("../controllers/functionsController");
 const jwtsecret = process.env.ADMIN_SECRET_KEY;
 const fromUser = process.env.FROM;
 const RegisterAdmin = async (req, res) => {
@@ -86,4 +88,27 @@ const ViewAllUsers = async (req, res) => {
     }
 };
 exports.ViewAllUsers = ViewAllUsers;
+const LockAccount = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const userObjectId = new mongoose_1.default.Schema.Types.ObjectId(userId);
+        let { reason } = req.body;
+        const locker = await (0, functionsController_1.LockedUsersAccount)(userObjectId);
+        if (!locker) {
+            return (0, helperFunctions_1.errorResponse)(res, 'User not found', http_status_1.default.NOT_FOUND);
+        }
+        // if (locker.reason) {
+        //     return errorResponse(res, 'User already locked', httpStatus.CONFLICT);
+        // }
+        // reason = reason ? reason : 'No reason provided';
+        // locker.reason = reason;
+        // await locker.save();
+        return (0, helperFunctions_1.successResponse)(res, 'User locked successfully', http_status_1.default.OK, locker);
+    }
+    catch (error) {
+        console.log(error);
+        return (0, helperFunctions_1.serverError)(res);
+    }
+};
+exports.LockAccount = LockAccount;
 //# sourceMappingURL=adminController.js.map

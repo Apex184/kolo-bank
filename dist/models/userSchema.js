@@ -53,6 +53,11 @@ const userSchema = new mongoose_1.default.Schema({
         default: false,
         required: true,
     },
+    isLocked: {
+        type: Boolean,
+        default: false,
+        required: true,
+    },
     bvn: {
         type: String,
         required: true,

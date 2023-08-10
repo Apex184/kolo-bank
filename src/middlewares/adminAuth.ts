@@ -31,7 +31,7 @@ export async function adminAuth(req: Request | any, res: Response, next: NextFun
         next();
     } catch (error) {
         console.log(error);
-        return res.status(httpStatus.FORBIDDEN).json({ Error: 'User is not authorised' });
+        return res.status(httpStatus.FORBIDDEN).json({ Error: 'Admin is not authorised' });
     }
 }
 
