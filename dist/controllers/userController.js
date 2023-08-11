@@ -49,8 +49,13 @@ const RegisterUser = async (req, res) => {
         });
         const token = (0, validations_1.generateLoginToken)({ _id: user._id, email: email });
         if (user) {
-            const html = (0, mailTemplate_1.emailVerificationView)(token);
+            user.verificationSentAt = new Date(); // Set the verificationSentAt field to the current timestamp
+            const expirationTime = new Date(user.verificationSentAt.getTime() + 5 * 60 * 1000); // 5 minutes in milliseconds
+            const currentTime = new Date();
+            const timeRemaining = expirationTime > currentTime ? expirationTime.getTime() - currentTime.getTime() : 0;
+            const html = (0, mailTemplate_1.emailVerificationView)(token, timeRemaining);
             await sendMail_1.default.sendEmail(fromUser, req.body.email, 'Please verify your email', html);
+            await user.save(); // Save the updated user document
         }
         res.status(http_status_1.default.CREATED).json({
             message: 'User created successfully',
@@ -71,12 +76,13 @@ async function verifyUser(req, res, next) {
         const token = req.params.token;
         try {
             const { email, _id } = jsonwebtoken_1.default.verify(token, jwtsecret);
-            console.log(email);
-            console.log(_id);
             if (!email) {
                 return (0, helperFunctions_1.errorResponse)(res, "Verification failed: Email not found in token", http_status_1.default.BAD_REQUEST);
             }
             const user = await userSchema_1.User.findOne({ email: email });
+            if (user === null || user === void 0 ? void 0 : user.isLocked) {
+                return (0, helperFunctions_1.errorResponse)(res, "Verification failed: User is locked, contact our support team", http_status_1.default.BAD_REQUEST);
+            }
             if (!user) {
                 return (0, helperFunctions_1.errorResponse)(res, "Verification failed: User not found", http_status_1.default.NOT_FOUND);
             }
@@ -102,6 +108,9 @@ const LoginUser = async (req, res) => {
         const user = await userSchema_1.User.findOne({ email: req.body.email });
         if (!user) {
             return (0, helperFunctions_1.errorResponse)(res, 'Incorrect credentials', http_status_1.default.BAD_REQUEST);
+        }
+        if (user === null || user === void 0 ? void 0 : user.isLocked) {
+            return (0, helperFunctions_1.errorResponse)(res, "Verification failed: User is locked, contact our support team", http_status_1.default.BAD_REQUEST);
         }
         const validUser = await bcryptjs_1.default.compare(req.body.password, user.password);
         if (!validUser) {

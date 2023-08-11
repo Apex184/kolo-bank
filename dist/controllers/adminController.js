@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LockAccount = exports.ViewAllUsers = exports.LoginAdmin = exports.RegisterAdmin = void 0;
-const mongoose_1 = __importDefault(require("mongoose"));
 const http_status_1 = __importDefault(require("http-status"));
 const userSchema_1 = require("../models/userSchema");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
@@ -76,7 +75,7 @@ const LoginAdmin = async (req, res) => {
 exports.LoginAdmin = LoginAdmin;
 const ViewAllUsers = async (req, res) => {
     try {
-        const users = await userSchema_1.User.find({ isVerified: true });
+        const users = await userSchema_1.User.find();
         if (!users) {
             return (0, helperFunctions_1.errorResponse)(res, 'No user found', http_status_1.default.NOT_FOUND);
         }
@@ -91,18 +90,11 @@ exports.ViewAllUsers = ViewAllUsers;
 const LockAccount = async (req, res) => {
     try {
         const { userId } = req.params;
-        const userObjectId = new mongoose_1.default.Schema.Types.ObjectId(userId);
-        let { reason } = req.body;
+        const userObjectId = userId.toString();
         const locker = await (0, functionsController_1.LockedUsersAccount)(userObjectId);
         if (!locker) {
             return (0, helperFunctions_1.errorResponse)(res, 'User not found', http_status_1.default.NOT_FOUND);
         }
-        // if (locker.reason) {
-        //     return errorResponse(res, 'User already locked', httpStatus.CONFLICT);
-        // }
-        // reason = reason ? reason : 'No reason provided';
-        // locker.reason = reason;
-        // await locker.save();
         return (0, helperFunctions_1.successResponse)(res, 'User locked successfully', http_status_1.default.OK, locker);
     }
     catch (error) {

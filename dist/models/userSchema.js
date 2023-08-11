@@ -58,6 +58,9 @@ const userSchema = new mongoose_1.default.Schema({
         default: false,
         required: true,
     },
+    verificationSentAt: {
+        type: Date,
+    },
     bvn: {
         type: String,
         required: true,

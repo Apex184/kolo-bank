@@ -20,6 +20,9 @@ const sendMoney = async (req, res) => {
         if (!user) {
             return (0, helperFunctions_1.errorResponse)(res, 'Not an active user', http_status_1.default.NOT_FOUND);
         }
+        if (user === null || user === void 0 ? void 0 : user.isLocked) {
+            return (0, helperFunctions_1.errorResponse)(res, "This account is locked, contact our support team", http_status_1.default.BAD_REQUEST);
+        }
         const { amount, destination } = req.body;
         try {
             const transactionResult = await (0, functionsController_1.sendMoneyToAnotherWallet)(user._id, amount, destination);

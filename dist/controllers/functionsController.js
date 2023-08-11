@@ -172,9 +172,12 @@ const LockedUsersAccount = async (userId) => {
         if (!user) {
             throw new Error('User not found.');
         }
+        if (user.isLocked) {
+            throw new Error('User is already locked.');
+        }
         user.isLocked = true;
         await user.save();
-        return user;
+        return "The user account has been locked successfully";
     }
     catch (error) {
         console.log(error);

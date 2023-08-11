@@ -41,6 +41,7 @@ export interface UserInterface extends mongoose.Document {
     dateOfBirth: Date;
     username: string;
     password: string;
+    verificationSentAt: Date;
     isBvnVerified: Boolean;
     address: {
         street: string;
@@ -112,6 +113,9 @@ const userSchema = new mongoose.Schema<UserInterface>({
         type: Boolean,
         default: false,
         required: true,
+    },
+    verificationSentAt: {
+        type: Date,
     },
     bvn: {
         type: String,

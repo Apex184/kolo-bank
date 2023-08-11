@@ -25,6 +25,9 @@ export const sendMoney = async (req: Request, res: Response): Promise<unknown> =
         if (!user) {
             return errorResponse(res, 'Not an active user', httpStatus.NOT_FOUND);
         }
+        if (user?.isLocked) {
+            return errorResponse(res, "This account is locked, contact our support team", httpStatus.BAD_REQUEST);
+        }
         const { amount, destination } = req.body;
         try {
             const transactionResult = await sendMoneyToAnotherWallet(user._id, amount, destination);

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import mongoose, { ObjectId } from 'mongoose';
+import mongoose from 'mongoose';
 import httpStatus from 'http-status';
 import { User } from "../models/userSchema";
 import bcrypt from 'bcryptjs'
@@ -93,7 +93,7 @@ export const LoginAdmin = async (req: Request, res: Response): Promise<unknown> 
 
 export const ViewAllUsers = async (req: Request, res: Response) => {
     try {
-        const users = await User.find({ isVerified: true });
+        const users = await User.find();
         if (!users) {
             return errorResponse(res, 'No user found', httpStatus.NOT_FOUND);
         }
@@ -108,20 +108,12 @@ export const ViewAllUsers = async (req: Request, res: Response) => {
 export const LockAccount = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
-        const userObjectId = new mongoose.Schema.Types.ObjectId(userId);
-        let { reason } = req.body;
+        const userObjectId = userId.toString();
         const locker = await LockedUsersAccount(userObjectId);
         if (!locker) {
             return errorResponse(res, 'User not found', httpStatus.NOT_FOUND);
         }
-        // if (locker.reason) {
-        //     return errorResponse(res, 'User already locked', httpStatus.CONFLICT);
-        // }
-        // reason = reason ? reason : 'No reason provided';
-        // locker.reason = reason;
-        // await locker.save();
         return successResponse(res, 'User locked successfully', httpStatus.OK, locker);
-
     } catch (error) {
         console.log(error);
         return serverError(res);

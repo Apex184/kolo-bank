@@ -191,15 +191,19 @@ export const sendMoneyToAnotherWallet = async (user: ObjectId, amount: number, d
 };
 
 
-export const LockedUsersAccount = async (userId: ObjectId) => {
+export const LockedUsersAccount = async (userId: string) => {
     try {
         const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found.');
         }
+        if (user.isLocked) {
+            throw new Error('User is already locked.');
+        }
+
         user.isLocked = true;
         await user.save();
-        return user;
+        return "The user account has been locked successfully";
     } catch (error) {
         console.log(error);
     }
