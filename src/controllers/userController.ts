@@ -62,16 +62,15 @@ export const RegisterUser = async (req: Request, res: Response): Promise<unknown
 
         const token = generateLoginToken({ _id: user._id, email: email });
         if (user) {
-            user.verificationSentAt = new Date(); // Set the verificationSentAt field to the current timestamp
-
-            const expirationTime = new Date(user.verificationSentAt.getTime() + 5 * 60 * 1000); // 5 minutes in milliseconds
+            user.verificationSentAt = new Date();
+            const expirationTime = new Date(user.verificationSentAt.getTime() + 5 * 60 * 1000);
             const currentTime = new Date();
             const timeRemaining = expirationTime > currentTime ? expirationTime.getTime() - currentTime.getTime() : 0;
 
             const html = emailVerificationView(token, timeRemaining);
             await mailer.sendEmail(fromUser, req.body.email, 'Please verify your email', html);
 
-            await user.save(); // Save the updated user document
+            await user.save();
         }
 
         res.status(httpStatus.CREATED).json({
@@ -83,7 +82,7 @@ export const RegisterUser = async (req: Request, res: Response): Promise<unknown
         });
     } catch (error) {
         console.error(error);
-        return serverError(res); // You should define the serverError function to send a proper error response
+        return serverError(res);
     }
 };
 

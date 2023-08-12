@@ -49,13 +49,13 @@ const RegisterUser = async (req, res) => {
         });
         const token = (0, validations_1.generateLoginToken)({ _id: user._id, email: email });
         if (user) {
-            user.verificationSentAt = new Date(); // Set the verificationSentAt field to the current timestamp
-            const expirationTime = new Date(user.verificationSentAt.getTime() + 5 * 60 * 1000); // 5 minutes in milliseconds
+            user.verificationSentAt = new Date();
+            const expirationTime = new Date(user.verificationSentAt.getTime() + 5 * 60 * 1000);
             const currentTime = new Date();
             const timeRemaining = expirationTime > currentTime ? expirationTime.getTime() - currentTime.getTime() : 0;
             const html = (0, mailTemplate_1.emailVerificationView)(token, timeRemaining);
             await sendMail_1.default.sendEmail(fromUser, req.body.email, 'Please verify your email', html);
-            await user.save(); // Save the updated user document
+            await user.save();
         }
         res.status(http_status_1.default.CREATED).json({
             message: 'User created successfully',
@@ -67,7 +67,7 @@ const RegisterUser = async (req, res) => {
     }
     catch (error) {
         console.error(error);
-        return (0, helperFunctions_1.serverError)(res); // You should define the serverError function to send a proper error response
+        return (0, helperFunctions_1.serverError)(res);
     }
 };
 exports.RegisterUser = RegisterUser;

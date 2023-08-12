@@ -20,6 +20,9 @@ const ViewWalletBalance = async (req, res) => {
         if (!user) {
             return (0, helperFunctions_1.errorResponse)(res, 'Not an active user', http_status_1.default.NOT_FOUND);
         }
+        if (user === null || user === void 0 ? void 0 : user.isLocked) {
+            return (0, helperFunctions_1.errorResponse)(res, "Your account is locked, contact our support team", http_status_1.default.BAD_REQUEST);
+        }
         const wallet = await (0, functionsController_1.getUserWalletById)(user._id);
         if (!wallet) {
             return (0, helperFunctions_1.errorResponse)(res, 'Wallet not found', http_status_1.default.NOT_FOUND);

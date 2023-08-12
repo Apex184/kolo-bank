@@ -30,6 +30,9 @@ export const ViewWalletBalance = async (req: Request, res: Response): Promise<un
         if (!user) {
             return errorResponse(res, 'Not an active user', httpStatus.NOT_FOUND);
         }
+        if (user?.isLocked) {
+            return errorResponse(res, "Your account is locked, contact our support team", httpStatus.BAD_REQUEST);
+        }
         const wallet = await getUserWalletById(user._id);
         if (!wallet) {
             return errorResponse(res, 'Wallet not found', httpStatus.NOT_FOUND);
