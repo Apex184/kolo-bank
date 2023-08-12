@@ -18,8 +18,9 @@ function emailVerificationView(token, timeRemaining) {
          display: inline-block;">Click here</a>
          
         </div>
+        
         <p>Your verification link will expire in:
-        ${minutes} minutes ${seconds} seconds
+        ${minutes} minutes ${seconds} seconds, for you to verify your email.
         </p>
      </div>
         `;
