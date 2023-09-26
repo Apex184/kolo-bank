@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_cron_1 = __importDefault(require("node-cron"));
 const dbConnect_1 = __importDefault(require("./config/dbConnect"));
 const indexRouter_1 = __importDefault(require("./routes/indexRouter"));
 const walletRouter_1 = __importDefault(require("./routes/walletRouter"));
@@ -17,7 +16,7 @@ const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const http_1 = __importDefault(require("http"));
-const node_cron_2 = require("./utills/node.cron");
+// import { checkCron } from "./utills/node.cron";
 dotenv_1.default.config();
 (0, dbConnect_1.default)();
 const app = (0, express_1.default)();
@@ -31,7 +30,7 @@ app.use(express_1.default.json({
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)());
-node_cron_1.default.schedule('* * * * *', node_cron_2.checkCron);
+// cron.schedule('* * * * *', checkCron);
 app.use('/', indexRouter_1.default);
 app.use('/kolo', userRouter_1.default);
 app.use('/kolo', flutterWaveRoute_1.default);

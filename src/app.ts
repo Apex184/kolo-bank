@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+// import cron from 'node-cron';
 import createError from 'http-errors';
 import dbConnect from './config/dbConnect';
 import indexRoute from './routes/indexRouter';
@@ -13,7 +13,7 @@ import logger from 'morgan';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import http from 'http';
-import { checkCron } from "./utills/node.cron";
+// import { checkCron } from "./utills/node.cron";
 dotenv.config()
 dbConnect()
 const app = express();
@@ -30,7 +30,7 @@ app.use(express.json({
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
-cron.schedule('* * * * *', checkCron);
+// cron.schedule('* * * * *', checkCron);
 
 app.use('/', indexRoute);
 app.use('/kolo', userRoute);
