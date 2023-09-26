@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LockedUsersAccount = exports.sendMoneyToAnotherWallet = exports.getUserWalletById = exports.updateWallet = exports.createTransaction = exports.createWalletTransaction = exports.createBankAccount = exports.createWallet = void 0;
+exports.sendBillingPlanToUser = exports.findAllUsers = exports.LockedUsersAccount = exports.sendMoneyToAnotherWallet = exports.getUserWalletById = exports.updateWallet = exports.createTransaction = exports.createWalletTransaction = exports.createBankAccount = exports.createWallet = void 0;
 const walletShema_1 = require("../models/walletShema");
 const walletTransaction_1 = require("../models/walletTransaction");
 const transactionSchema_1 = require("../models/transactionSchema");
@@ -184,4 +184,30 @@ const LockedUsersAccount = async (userId) => {
     }
 };
 exports.LockedUsersAccount = LockedUsersAccount;
+const findAllUsers = async () => {
+    try {
+        const user = await userSchema_1.User.find();
+        if (user.length < 1) {
+            throw new Error('User not found.');
+        }
+        return user;
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.findAllUsers = findAllUsers;
+const sendBillingPlanToUser = async (user, billingPlan) => {
+    try {
+        const userWallet = await userSchema_1.User.findOne({ user: user._id });
+        if (!userWallet) {
+            throw new Error('Wallet not found.');
+        }
+        return userWallet;
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.sendBillingPlanToUser = sendBillingPlanToUser;
 //# sourceMappingURL=functionsController.js.map

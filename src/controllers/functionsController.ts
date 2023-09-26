@@ -208,4 +208,28 @@ export const LockedUsersAccount = async (userId: string) => {
         console.log(error);
     }
 }
+export const findAllUsers = async () => {
+    try {
+        const user = await User.find();
+        if (user.length < 1) {
+            throw new Error('User not found.');
+        }
+        return user;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const sendBillingPlanToUser = async (user: UserInterface, billingPlan: any) => {
+    try {
+        const userWallet = await User.findOne({ user: user._id });
+        if (!userWallet) {
+            throw new Error('Wallet not found.');
+        }
+        return userWallet;
+
+    } catch (error) {
+        console.log(error);
+    }
+}
 

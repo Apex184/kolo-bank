@@ -3,8 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.directDebit = exports.bankTransfer = exports.responses = exports.createPayments = void 0;
+exports.belraldPayment = exports.directDebit = exports.bankTransfer = exports.updateBillingById = exports.getCreatedBilling = exports.createBilling = exports.responses = exports.createPayments = void 0;
 const got = require("got");
+const request_1 = __importDefault(require("request"));
 const Flutterwave = require('flutterwave-node-v3');
 const flw = new Flutterwave(process.env.FLUTTERWAVE_V3_PUB_KEY, process.env.FLUTTERWAVE_V3_SECRET_KEY);
 const generateFunc_1 = require("../utills/generateFunc");
@@ -17,6 +18,7 @@ const helperFunctions_1 = require("../utills/helperFunctions");
 const userSchema_1 = require("../models/userSchema");
 const jwtsecret = process.env.JWT_SECRET;
 const fromUser = process.env.FROM;
+const functionsController_2 = require("../controllers/functionsController");
 const createPayments = async (req, res, next) => {
     try {
         const verified = req.headers.token;
@@ -103,6 +105,99 @@ const responses = async (req, res, next) => {
     }
 };
 exports.responses = responses;
+const createBilling = async (req, res, next) => {
+    try {
+        const url = `https://api.flutterwave.com/v3/payment-plans`;
+        const { amount, name, interval, duration } = req.body;
+        const options = {
+            'method': 'POST',
+            // 'url': '{{BASE_API_URL}}/payment-plans',
+            url: url,
+            'headers': {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.FLUTTERWAVE_V3_SECRET_KEY} `,
+            },
+            body: JSON.stringify({ amount, name, interval, duration, currency: "NGN" })
+        };
+        (0, request_1.default)(options, async function (error, response) {
+            if (error) {
+                console.error('Error:', error);
+                return res.status(500).json({ success: false, message: 'An error occurred while creating billing.' });
+            }
+            try {
+                const responseData = JSON.parse(response.body);
+                const users = await (0, functionsController_2.findAllUsers)();
+                if (users) {
+                    for (const user of users) {
+                        await (0, functionsController_2.sendBillingPlanToUser)(user, responseData);
+                    }
+                    return res.status(200).json({ success: true, message: 'Billing created and sent successfully to all users.' });
+                }
+            }
+            catch (error) {
+                console.error('Error:', error);
+                return res.status(500).json({ success: false, message: 'An error occurred while sending billing to users.' });
+            }
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.createBilling = createBilling;
+const getCreatedBilling = async (req, res, next) => {
+    try {
+        const url = `https://api.flutterwave.com/v3/payment-plans`;
+        const options = {
+            'method': 'GET',
+            url: url,
+            'headers': {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.FLUTTERWAVE_V3_SECRET_KEY} `,
+            },
+        };
+        (0, request_1.default)(options, function (error, response) {
+            if (error) {
+                console.error('Error:', error);
+                return res.status(500).json({ success: false, message: 'An error occurred while getting billing.' });
+            }
+            const responseData = JSON.parse(response.body);
+            return res.status(200).json({ success: true, message: 'Billing retrieved successfully.', responseData });
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.getCreatedBilling = getCreatedBilling;
+const updateBillingById = async (req, res, next) => {
+    try {
+        const { billingId } = req.params;
+        const url = `https://api.flutterwave.com/v3/payment-plans/${billingId}`;
+        const { amount, name, interval, duration } = req.body;
+        const options = {
+            'method': 'PUT',
+            url: url,
+            'headers': {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.FLUTTERWAVE_V3_SECRET_KEY} `,
+            },
+            body: JSON.stringify({ amount, name, interval, duration, currency: "NGN" })
+        };
+        (0, request_1.default)(options, function (error, response) {
+            if (error) {
+                console.error('Error:', error);
+                return res.status(500).json({ success: false, message: 'An error occurred while updating billing.' });
+            }
+            const responseData = JSON.parse(response.body);
+            return res.status(200).json({ success: true, message: 'Billing updated successfully.', responseData });
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+exports.updateBillingById = updateBillingById;
 const bankTransfer = async (req, res, next) => {
     try {
         const verified = req.headers.token;
@@ -168,4 +263,60 @@ const directDebit = async (req, res, next) => {
     }
 };
 exports.directDebit = directDebit;
+const multiplyAmount = (amount) => {
+    return amount * 4;
+};
+const belraldPayment = async (req, res, next) => {
+    try {
+        const verified = req.headers.token;
+        const token = jsonwebtoken_1.default.verify(verified, jwtsecret);
+        const { _id } = token;
+        const user = await userSchema_1.User.findOne({ _id: _id });
+        if (!user) {
+            return (0, helperFunctions_1.errorResponse)(res, 'Not an active user', http_status_1.default.NOT_FOUND);
+        }
+        const transaction_id = (0, generateFunc_1.generateReference)();
+        const { userInput } = req.body;
+        const amount = multiplyAmount(userInput);
+        const response = await got.post("https://api.flutterwave.com/v3/payments", {
+            headers: {
+                Authorization: `Bearer ${process.env.FLUTTERWAVE_V3_SECRET_KEY}`
+            },
+            json: {
+                tx_ref: transaction_id,
+                // amount: multiplyAmount(amount),
+                amount,
+                currency: "NGN",
+                redirect_url: "http://localhost:8080/kolo/verify-transaction",
+                payment_plan: 54914,
+                userInput: parseInt(userInput),
+                meta: {
+                    consumer_id: 23,
+                    consumer_mac: "92a3-912ba-1192a",
+                },
+                customer: {
+                    email: user.email,
+                    phonenumber: user.phonenumber,
+                    name: user.firstName,
+                },
+                customizations: {
+                    title: "Belrald University",
+                    logo: "http://www.piedpiper.com/app/themes/joystick-v27/images/logo.png"
+                }
+            }
+        }).json();
+        if (response) {
+            console.log(response.data.amount);
+            console.log("Amount straight", amount);
+            return (0, helperFunctions_1.successResponse)(res, 'Payment initiated', http_status_1.default.OK, response);
+        }
+        else {
+            return (0, helperFunctions_1.errorResponse)(res, 'An error occured', http_status_1.default.NOT_FOUND);
+        }
+    }
+    catch (err) {
+        console.log(err.code);
+    }
+};
+exports.belraldPayment = belraldPayment;
 //# sourceMappingURL=flutter.js.map

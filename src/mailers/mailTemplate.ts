@@ -23,3 +23,13 @@ export function emailVerificationView(token: string, timeRemaining: number): str
         `;
     return temp;
 }
+
+export const emailHtml = (otp: number) => {
+    const temp = `
+    <div style="max-width: 700; font-size:110%; border: 10px solid #ddd; padding: 50px 20px; marging: auto;">
+        <h2 style ="text-transform: uppercase; text-align: center; color: teal;">Welcome to Medly Social media App</h2>
+        <p>Hi there, your otp is <span style="font-weight: bold; font-size: 20px">${otp}</span>, it will expire in 30min</p>
+    </div>
+    `
+    return temp
+}
