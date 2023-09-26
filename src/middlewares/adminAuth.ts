@@ -23,6 +23,7 @@ export async function adminAuth(req: Request | any, res: Response, next: NextFun
         const data = await Admin.findOne({ _id });
         const adminRoute = data?.role === "admin";
         if (!adminRoute) {
+
             res.status(httpStatus.UNAUTHORIZED).json({
                 Error: 'Unauthorised user',
             });

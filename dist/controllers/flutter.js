@@ -263,8 +263,8 @@ const directDebit = async (req, res, next) => {
     }
 };
 exports.directDebit = directDebit;
-const multiplyAmount = (amount) => {
-    return amount * 4;
+const multiplyAmount = (amount, seat) => {
+    return amount * seat;
 };
 const belraldPayment = async (req, res, next) => {
     try {
@@ -277,14 +277,13 @@ const belraldPayment = async (req, res, next) => {
         }
         const transaction_id = (0, generateFunc_1.generateReference)();
         const { userInput } = req.body;
-        const amount = multiplyAmount(userInput);
+        const amount = multiplyAmount(userInput, 4);
         const response = await got.post("https://api.flutterwave.com/v3/payments", {
             headers: {
                 Authorization: `Bearer ${process.env.FLUTTERWAVE_V3_SECRET_KEY}`
             },
             json: {
                 tx_ref: transaction_id,
-                // amount: multiplyAmount(amount),
                 amount,
                 currency: "NGN",
                 redirect_url: "http://localhost:8080/kolo/verify-transaction",
